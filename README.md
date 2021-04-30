@@ -1,3 +1,3 @@
-Design system
+# Installation
 
 `npm install chalkui --save`
