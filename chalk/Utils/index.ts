@@ -16,4 +16,7 @@ export * from './Function'
 export * from './DomQuery'
 export * from './Focus'
 export * from './PointerEvent'
+export * from './Lazy'
+export * from './UserAgent'
+export * from './Breakpoint'
 export * from "css-box-model"

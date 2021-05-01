@@ -1,6 +1,11 @@
 import {
-   chalk, forwardRef, HTMLChalkProps,
-   omitThemingProps, ThemingProps, useStyleConfig, useTheme,
+   chalk,
+   forwardRef,
+   HTMLChalkProps,
+   omitThemingProps,
+   ThemingProps,
+   useStyleConfig,
+   useTheme,
 }                             from "../../System"
 import * as React             from "react"
 import { cx }                 from '../../Utils'

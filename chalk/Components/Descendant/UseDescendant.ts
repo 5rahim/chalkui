@@ -1,19 +1,20 @@
+import {
+   createContext,
+   mergeRefs,
+} from "../ReactUtils"
 import React, {
    RefCallback,
    useRef,
    useState,
-}                              from "react"
-import { useSafeLayoutEffect } from '../../Hooks'
+} from "react"
 import {
-   DescendantOptions,
    DescendantsManager,
-}                              from './Descendant'
+   DescendantOptions,
+} from "./Descendant"
 import {
-   createContext,
-   mergeRefs,
-}                              from '../ReactUtils'
-import { cast }                from './Utils'
-
+   useSafeLayoutEffect,
+   cast,
+} from "./Utils"
 
 /**
  * @internal

@@ -1,42 +1,38 @@
-import { motion, Variants }                              from "framer-motion"
-import * as React                                        from "react"
-import { usePopover, UsePopoverProps, UsePopoverReturn } from './UsePopover'
-import { createContext, MaybeRenderProp }                from '../ReactUtils'
 import {
-   chalk, forwardRef, HTMLChalkProps, omitThemingProps,
-   StylesProvider, SystemStyleObject, ThemingProps, useMultiStyleConfig, useStyles, useTheme,
-} from '../../System'
-import { cx, runIfFn }                                   from '../../Utils'
-import { CloseButton, CloseButtonProps }                 from '../CloseButton'
-
-const motionVariants: Variants = {
-   exit: {
-      opacity: 0,
-      scale: 0.95,
-      transition: {
-         duration: 0.1,
-         ease: [0.4, 0, 1, 1],
-      },
-      transitionEnd: {
-         visibility: "hidden",
-      },
-   },
-   enter: {
-      visibility: "visible",
-      scale: 1,
-      opacity: 1,
-      transition: {
-         duration: 0.15,
-         ease: [0, 0, 0.2, 1],
-      },
-   },
-}
-
-const [PopoverProvider, usePopoverContext] = createContext<UsePopoverReturn>({
-   name: "PopoverContext",
-   errorMessage:
-      "usePopoverContext: `context` is undefined. Seems you forgot to wrap all popover components within `<Popover />`",
-})
+   CloseButton,
+   CloseButtonProps,
+}                          from "../CloseButton"
+import { MaybeRenderProp } from "../ReactUtils"
+import {
+   chalk,
+   forwardRef,
+   HTMLChalkProps,
+   omitThemingProps,
+   StylesProvider,
+   SystemStyleObject,
+   ThemingProps,
+   useMultiStyleConfig,
+   useStyles,
+   useTheme,
+}                          from "../../System"
+import {
+   cx,
+   runIfFn,
+   __DEV__,
+}                          from "../../Utils"
+import * as React          from "react"
+import {
+   PopoverProvider,
+   usePopoverContext,
+}                          from "./PopoverContext"
+import {
+   PopoverTransition,
+   PopoverTransitionProps,
+}                          from "./PopoverTransition"
+import {
+   usePopover,
+   UsePopoverProps,
+}                          from "./UsePopover"
 
 export { usePopoverContext }
 
@@ -57,7 +53,6 @@ export interface PopoverProps extends UsePopoverProps, ThemingProps<"Popover"> {
  * typically to suggest an action or to guide users through a new experience.
  */
 export const Popover: React.FC<PopoverProps> = (props) => {
-   const theme = useTheme()
    const styles = useMultiStyleConfig("Popover", props)
    
    const { children, ...rest } = omitThemingProps(props)
@@ -84,26 +79,22 @@ export const Popover: React.FC<PopoverProps> = (props) => {
 export const PopoverTrigger: React.FC = (props) => {
    // enforce a single child
    const child: any = React.Children.only(props.children)
+   const theme = useTheme()
    const { getTriggerProps } = usePopoverContext()
-   return React.cloneElement(child, getTriggerProps(child.props, child.ref))
+   return React.cloneElement(child, { ...getTriggerProps(child.props, child.ref), theme: theme })
 }
 
 
-export interface PopoverContentProps extends HTMLChalkProps<"section"> {
+export interface PopoverContentProps extends PopoverTransitionProps {
+   rootProps?: HTMLChalkProps<"div">
 }
-
-const Motion = chalk(motion.section)
 
 export const PopoverContent = forwardRef<PopoverContentProps, "section">(
    (props, ref) => {
-      const {
-         isOpen,
-         getPopoverProps,
-         onTransitionEnd,
-         getPopoverPositionerProps,
-      } = usePopoverContext()
+      const { rootProps, ...contentProps } = props
       const theme = useTheme()
-   
+      const { getPopoverProps, getPopoverPositionerProps } = usePopoverContext()
+      
       const styles = useStyles()
       const contentStyles: SystemStyleObject = {
          position: "relative",
@@ -112,19 +103,18 @@ export const PopoverContent = forwardRef<PopoverContentProps, "section">(
          ...styles.content,
       }
       
-      const popoverProps: any = getPopoverProps(props, ref)
-      
       return (
-         <chalk.div theme={theme} __css={styles.popper} {...getPopoverPositionerProps()}>
-            <Motion
+         <chalk.div
+            theme={theme}
+            {...getPopoverPositionerProps(rootProps)}
+            __css={styles.popper}
+            className="chalk-popover__popper"
+         >
+            <PopoverTransition
                theme={theme}
-               {...popoverProps}
-               onUpdate={onTransitionEnd}
+               {...getPopoverProps(contentProps, ref)}
                className={cx("chalk-popover__content", props.className)}
                __css={contentStyles}
-               variants={motionVariants}
-               initial={false}
-               animate={isOpen ? "enter" : "exit"}
             />
          </chalk.div>
       )
@@ -141,23 +131,15 @@ export interface PopoverHeaderProps extends HTMLChalkProps<"header"> {
  */
 export const PopoverHeader = forwardRef<PopoverHeaderProps, "header">(
    (props, ref) => {
-      const { headerId, setHasHeader } = usePopoverContext()
+      const { getHeaderProps } = usePopoverContext()
       const theme = useTheme()
-   
-      React.useEffect(() => {
-         setHasHeader.on()
-         return () => setHasHeader.off()
-      }, [setHasHeader])
-      
       const styles = useStyles()
       
       return (
          <chalk.header
             theme={theme}
-            {...props}
+            {...getHeaderProps(props, ref)}
             className={cx("chalk-popover__header", props.className)}
-            id={headerId}
-            ref={ref}
             __css={styles.header}
          />
       )
@@ -173,23 +155,15 @@ export interface PopoverBodyProps extends HTMLChalkProps<"div"> {
  * at least one interactive element.
  */
 export const PopoverBody = forwardRef<PopoverBodyProps, "div">((props, ref) => {
-   const { bodyId, setHasBody } = usePopoverContext()
+   const { getBodyProps } = usePopoverContext()
    const theme = useTheme()
-   
-   React.useEffect(() => {
-      setHasBody.on()
-      return () => setHasBody.off()
-   }, [setHasBody])
-   
    const styles = useStyles()
    
    return (
       <chalk.div
          theme={theme}
-         {...props}
+         {...getBodyProps(props, ref)}
          className={cx("chalk-popover__body", props.className)}
-         id={bodyId}
-         ref={ref}
          __css={styles.body}
       />
    )
@@ -202,7 +176,6 @@ export interface PopoverFooterProps extends HTMLChalkProps<"footer"> {
 export const PopoverFooter: React.FC<PopoverFooterProps> = (props) => {
    const styles = useStyles()
    const theme = useTheme()
-   
    return (
       <chalk.footer
          theme={theme}
@@ -220,12 +193,11 @@ export const PopoverCloseButton: React.FC<CloseButtonProps> = (props) => {
    const { onClose } = usePopoverContext()
    return (
       <CloseButton
-         // size="sm"
          onClick={onClose}
          position="absolute"
          borderRadius="md"
          top="0.25rem"
-         right="0.25rem"
+         right="0.5rem"
          padding="0.5rem"
          {...props}
       />
@@ -238,25 +210,30 @@ export interface PopoverArrowProps extends HTMLChalkProps<"div"> {
 
 export const PopoverArrow: React.FC<PopoverArrowProps> = (props) => {
    const { bg, bgColor, backgroundColor } = props
+   const theme = useTheme()
+   const { getArrowProps, getArrowInnerProps } = usePopoverContext()
    const styles = useStyles()
    const arrowBg = bg ?? bgColor ?? backgroundColor
-   const theme = useTheme()
-   
-   
    return (
-      <chalk.div data-popper-arrow className="chalk-popover__arrow-positioner">
+      <chalk.div
+         theme={theme}
+         {...getArrowProps()}
+         className="chalk-popover__arrow-positioner"
+      >
          <chalk.div
             theme={theme}
             className={cx("chalk-popover__arrow", props.className)}
-            {...props}
-            data-popper-arrow-inner
+            {...getArrowInnerProps(props)}
             __css={{
                ...styles.arrow,
-               ...(arrowBg && {
-                  // "--popper-arrow-bg": `colors.${arrowBg}, ${arrowBg}`,
-               }),
+               // @ts-ignore
+               "--popper-arrow-bg": arrowBg
+                  ? `colors.${arrowBg}, ${arrowBg}`
+                  : undefined,
             }}
          />
       </chalk.div>
    )
 }
+
+

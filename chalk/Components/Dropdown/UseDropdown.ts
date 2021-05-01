@@ -1,24 +1,65 @@
-import * as React                        from "react"
+import { useClickable } from "../../Hooks/use-clickable"
+import { createDescendantContext } from "../Descendant"
 import {
-   addItem, callAllHandlers, dataAttr, focus, getNextIndex,
-   getNextItemFromSearch, getPrevIndex, isArray, isString,
-   normalizeEventKey, removeItem,
-}                                        from '../../Utils'
+   useControllableState,
+   useDisclosure,
+   UseDisclosureProps,
+   useFocusOnHide,
+   useId,
+   useIds,
+   useOutsideClick,
+   useShortcut,
+   useUpdateEffect,
+} from "../../Hooks"
+import { usePopper, UsePopperProps } from "../Popper"
 import {
-   useControllableState, useDisclosure, UseDisclosureProps,
-   useFocusOnHide, useId, useIds, useOutsideClick, useShortcut, useUpdateEffect,
-}                                        from '../../Hooks'
-import { usePopper, UsePopperProps }     from '../Popper'
-import { useDescendant, useDescendants } from '../../Hooks/use-descendant'
-import { useClickable }                                            from '../../Hooks/use-clickable'
-import { createContext, EventKeyMap, getValidChildren, mergeRefs } from '../ReactUtils'
+   createContext,
+   EventKeyMap,
+   getValidChildren,
+   mergeRefs,
+} from "../ReactUtils"
+import {
+   addItem,
+   callAllHandlers,
+   dataAttr,
+   determineLazyBehavior,
+   focus,
+   getNextItemFromSearch,
+   getOwnerDocument,
+   isActiveElement,
+   isArray,
+   isString,
+   LazyBehavior,
+   normalizeEventKey,
+   removeItem,
+} from "../../Utils"
+import * as React from "react"
 
-const [DropdownProvider, useDropdownContext] = createContext<UseDropdownReturn>({
+/* -------------------------------------------------------------------------------------------------
+ * Create context to track descendants and their indices
+ * -----------------------------------------------------------------------------------------------*/
+
+export const [
+   DropdownDescendantsProvider,
+   useDropdownDescendantsContext,
+   useDropdownDescendants,
+   useDropdownDescendant,
+] = createDescendantContext<HTMLElement>()
+
+/* -------------------------------------------------------------------------------------------------
+ * Create context to track dropdown state and logic
+ * -----------------------------------------------------------------------------------------------*/
+
+export const [DropdownProvider, useDropdownContext] = createContext<
+   Omit<UseDropdownReturn, "descendants">
+   >({
    strict: false,
    name: "DropdownContext",
 })
 
-export { DropdownProvider, useDropdownContext }
+/* -------------------------------------------------------------------------------------------------
+ * useDropdown hook
+ * -----------------------------------------------------------------------------------------------*/
 
 export interface UseDropdownProps extends UsePopperProps, UseDisclosureProps {
    /**
@@ -48,6 +89,18 @@ export interface UseDropdownProps extends UsePopperProps, UseDisclosureProps {
     * until the dropdown is open.
     */
    isLazy?: boolean
+   /**
+    * Performance 🚀:
+    * The lazy behavior of dropdown's content when not visible.
+    * Only works when `isLazy={true}`
+    *
+    * - "unmount": The dropdown's content is always unmounted when not open.
+    * - "keepMounted": The dropdown's content initially unmounted,
+    * but stays mounted when dropdown is open.
+    *
+    * @default "unmount"
+    */
+   lazyBehavior?: LazyBehavior
 }
 
 /**
@@ -56,23 +109,34 @@ export interface UseDropdownProps extends UsePopperProps, UseDisclosureProps {
  * It provides the logic and will be used with react context
  * to propagate its return value to all children
  */
-export function useDropdown(props: UseDropdownProps) {
+export function useDropdown(props: UseDropdownProps = {}) {
    const {
       id,
       closeOnSelect = true,
       closeOnBlur = true,
       autoSelect = true,
       isLazy,
+      isOpen: isOpenProp,
+      defaultIsOpen,
+      onClose: onCloseProp,
+      onOpen: onOpenProp,
       placement = "bottom-start",
+      lazyBehavior = "unmount",
+      ...popperProps
    } = props
    
-   const { isOpen, onOpen, onClose, onToggle } = useDisclosure(props)
+   const { isOpen, onOpen, onClose, onToggle } = useDisclosure({
+      isOpen: isOpenProp,
+      defaultIsOpen,
+      onClose: onCloseProp,
+      onOpen: onOpenProp,
+   })
    
    /**
     * Prepare the reference to the dropdown and disclosure
     */
-   const dropdownRef: any = React.useRef<HTMLDivElement>(null)
-   const buttonRef: any = React.useRef<HTMLButtonElement>(null)
+   const dropdownRef = React.useRef<HTMLDivElement>(null)
+   const buttonRef = React.useRef<HTMLButtonElement>(null)
    
    useOutsideClick({
       ref: dropdownRef,
@@ -91,8 +155,8 @@ export function useDropdown(props: UseDropdownProps) {
     * Add some popper.js for dynamic positioning
     */
    const popper = usePopper({
+      ...popperProps,
       placement,
-      ...props,
    })
    
    const [focusedIndex, setFocusedIndex] = React.useState(-1)
@@ -100,7 +164,7 @@ export function useDropdown(props: UseDropdownProps) {
    /**
     * Context to register all dropdown item nodes
     */
-   const domContext = useDescendants<HTMLDivElement, {}>()
+   const descendants = useDropdownDescendants()
    
    /**
     * Focus the button when we close the dropdown
@@ -129,30 +193,33 @@ export function useDropdown(props: UseDropdownProps) {
    
    const openAndFocusFirstItem = React.useCallback(() => {
       onOpen()
-      setFocusedIndex(0)
-   }, [onOpen, setFocusedIndex])
+      const first = descendants.firstEnabled()
+      if (first) setFocusedIndex(first.index)
+   }, [onOpen, setFocusedIndex, descendants])
    
    const openAndFocusLastItem = React.useCallback(() => {
       onOpen()
-      setFocusedIndex(domContext.descendants.length - 1)
-   }, [onOpen, setFocusedIndex, domContext.descendants])
+      const last = descendants.lastEnabled()
+      if (last) setFocusedIndex(last.index)
+   }, [onOpen, setFocusedIndex, descendants])
    
    const refocus = React.useCallback(() => {
-      const hasFocusWithin = dropdownRef.current?.contains(document.activeElement)
+      const doc = getOwnerDocument(dropdownRef.current)
+      const hasFocusWithin = dropdownRef.current?.contains(doc.activeElement)
       const shouldRefocus = isOpen && !hasFocusWithin
       
       if (!shouldRefocus) return
       
-      const el = domContext.descendants[focusedIndex]?.element
-      el?.focus({ preventScroll: true })
-   }, [isOpen, focusedIndex, domContext.descendants])
+      const el = descendants.item(focusedIndex)?.node
+      if (el) focus(el)
+   }, [isOpen, focusedIndex, descendants])
    
    return {
       openAndFocusDropdown,
       openAndFocusFirstItem,
       openAndFocusLastItem,
       onTransitionEnd: refocus,
-      domContext,
+      descendants,
       popper,
       buttonId,
       dropdownId,
@@ -170,11 +237,17 @@ export function useDropdown(props: UseDropdownProps) {
       autoSelect,
       setFocusedIndex,
       isLazy,
+      lazyBehavior,
    }
 }
 
-export interface UseDropdownReturn extends ReturnType<typeof useDropdown> {
-}
+export interface UseDropdownReturn extends ReturnType<typeof useDropdown> {}
+
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownButton hook
+ * -----------------------------------------------------------------------------------------------*/
+export interface UseDropdownButtonProps
+   extends Omit<React.HTMLAttributes<Element>, "color"> {}
 
 /**
  * React Hook to manage a dropdown button.
@@ -183,13 +256,8 @@ export interface UseDropdownReturn extends ReturnType<typeof useDropdown> {
  * in a component higher up the tree, and its return value
  * is passed as `context` to this hook.
  */
-
-export interface UseDropdownButtonProps
-   extends Omit<React.HTMLAttributes<Element>, "color"> {
-}
-
 export function useDropdownButton(
-   props: UseDropdownButtonProps,
+   props: UseDropdownButtonProps = {},
    externalRef: React.Ref<any> = null,
 ) {
    const dropdown = useDropdownContext()
@@ -233,7 +301,7 @@ export function useDropdownButton(
       [openAndFocusFirstItem, openAndFocusLastItem],
    )
    
-   const buttonProps = {
+   return {
       ...props,
       ref: mergeRefs(dropdown.buttonRef, externalRef, popper.referenceRef),
       id: dropdown.buttonId,
@@ -244,9 +312,20 @@ export function useDropdownButton(
       onClick: callAllHandlers(props.onClick, onClick),
       onKeyDown: callAllHandlers(props.onKeyDown, onKeyDown),
    }
-   
-   return buttonProps
 }
+
+function isTargetDropdownItem(event: Pick<MouseEvent, "currentTarget">) {
+   const target = event.currentTarget as HTMLElement
+   // this will catch `dropdownitem`, `dropdownitemradio`, `dropdownitemcheckbox`
+   return !!target.getAttribute("role")?.startsWith("dropdownitem")
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownList
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface UseDropdownListProps
+   extends Omit<React.HTMLAttributes<Element>, "color"> {}
 
 /**
  * React Hook to manage a dropdown list.
@@ -255,13 +334,8 @@ export function useDropdownButton(
  * in a component higher up the tree, and its return value
  * is passed as `context` to this hook.
  */
-
-export interface UseDropdownListProps
-   extends Omit<React.HTMLAttributes<Element>, "color"> {
-}
-
 export function useDropdownList(
-   props: UseDropdownListProps,
+   props: UseDropdownListProps = {},
    ref: React.Ref<any> = null,
 ) {
    const dropdown = useDropdownContext()
@@ -279,16 +353,21 @@ export function useDropdownList(
       isOpen,
       onClose,
       dropdownId,
-      domContext: { descendants },
       isLazy,
+      lazyBehavior,
    } = dropdown
+   
+   const descendants = useDropdownDescendantsContext()
    
    /**
     * Hook that creates a keydown event handler that listens
     * to printable keyboard character press
     */
-   const onCharacterPress = useShortcut({
-      preventDefault: (event) => event.key !== " ",
+   const createTypeaheadHandler = useShortcut({
+      preventDefault: (event) => {
+         const isDropdownItem = isTargetDropdownItem(event)
+         return event.key !== " " && isDropdownItem
+      },
    })
    
    const onKeyDown = React.useCallback(
@@ -296,17 +375,15 @@ export function useDropdownList(
          const eventKey = normalizeEventKey(event)
          
          const keyMap: EventKeyMap = {
-            Tab: (event: any) => {
-               event.preventDefault()
-            },
+            Tab: (event) => event.preventDefault(),
             Escape: onClose,
             ArrowDown: () => {
-               const nextIndex = getNextIndex(focusedIndex, descendants.length)
-               setFocusedIndex(nextIndex)
+               const next = descendants.nextEnabled(focusedIndex)
+               if (next) setFocusedIndex(next.index)
             },
             ArrowUp: () => {
-               const prevIndex = getPrevIndex(focusedIndex, descendants.length)
-               setFocusedIndex(prevIndex)
+               const prev = descendants.prevEnabled(focusedIndex)
+               if (prev) setFocusedIndex(prev.index)
             },
          }
          
@@ -318,33 +395,50 @@ export function useDropdownList(
             return
          }
          
-         const characterHandler = onCharacterPress((character) => {
-            /**
-             * Typeahead: Based on current character pressed,
-             * find the next item to be selected
-             */
+         /**
+          * Typeahead: Based on current character pressed,
+          * find the next item to be selected
+          */
+         const onTypeahead = createTypeaheadHandler((character) => {
             const nextItem = getNextItemFromSearch(
-               descendants,
+               descendants.values(),
                character,
-               (node) => node.element?.textContent || "",
-               descendants[focusedIndex],
+               (item) => item?.node?.textContent ?? "",
+               descendants.item(focusedIndex),
             )
-            
             if (nextItem) {
-               const index = descendants.indexOf(nextItem)
+               const index = descendants.indexOf(nextItem.node)
                setFocusedIndex(index)
             }
          })
          
-         characterHandler(event)
+         onTypeahead(event)
       },
-      [descendants, focusedIndex, onCharacterPress, onClose, setFocusedIndex],
+      [
+         descendants,
+         focusedIndex,
+         createTypeaheadHandler,
+         onClose,
+         setFocusedIndex,
+      ],
    )
+   
+   const hasBeenOpened = React.useRef(false)
+   if (isOpen) {
+      hasBeenOpened.current = true
+   }
+   
+   const shouldRenderChildren = determineLazyBehavior({
+      hasBeenSelected: hasBeenOpened.current,
+      isLazy,
+      lazyBehavior,
+      isSelected: isOpen,
+   })
    
    return {
       ...props,
       ref: mergeRefs(dropdownRef, ref),
-      children: !isLazy || isOpen ? props.children : null,
+      children: shouldRenderChildren ? props.children : null,
       tabIndex: -1,
       role: "dropdown",
       id: dropdownId,
@@ -357,23 +451,45 @@ export function useDropdownList(
    }
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownPosition: Composes usePopper to position the dropdown
+ * -----------------------------------------------------------------------------------------------*/
+
 export function useDropdownPositioner(props: any = {}) {
    const { popper, isOpen } = useDropdownContext()
-   return {
+   return popper.getPopperProps({
       ...props,
-      ref: popper.popperRef,
-      style: { visibility: isOpen ? "visible" : "hidden" },
-   }
+      style: {
+         visibility: isOpen ? "visible" : "hidden",
+         ...props.style,
+      },
+   })
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownItem: Hook for each dropdown item within the dropdown list.
+ We also use it in `useDropdownItemOption`
+ * -----------------------------------------------------------------------------------------------*/
 
 export interface UseDropdownItemProps
    extends Omit<React.HTMLAttributes<Element>, "color"> {
+   /**
+    * If `true`, the dropdownitem will be disabled
+    */
    isDisabled?: boolean
+   /**
+    * If `true` and the dropdownitem is disabled, it'll
+    * remain keyboard-focusable
+    */
    isFocusable?: boolean
+   /**
+    * Overrides the parent dropdown's `closeOnSelect` prop.
+    */
+   closeOnSelect?: boolean
 }
 
 export function useDropdownItem(
-   props: UseDropdownItemProps,
+   props: UseDropdownItemProps = {},
    externalRef: React.Ref<any> = null,
 ) {
    const {
@@ -383,39 +499,36 @@ export function useDropdownItem(
       onClick: onClickProp,
       isDisabled,
       isFocusable,
+      closeOnSelect,
       ...htmlProps
    } = props
    
    const dropdown = useDropdownContext()
    
    const {
-      domContext,
       setFocusedIndex,
       focusedIndex,
-      closeOnSelect,
+      closeOnSelect: dropdownCloseOnSelect,
       onClose,
       dropdownRef,
       isOpen,
+      dropdownId,
    } = dropdown
    
    const ref = React.useRef<HTMLDivElement>(null)
-   const id = `dropdownitem-${useId()}`
+   const id = `${dropdownId}-dropdownitem-${useId()}`
    
    /**
     * Register the dropdownitem's node into the domContext
     */
-   const index = useDescendant({
-      element: ref.current,
-      context: domContext,
-      disabled: isDisabled,
-      focusable: isFocusable,
+   const { index, register } = useDropdownDescendant({
+      disabled: isDisabled && !isFocusable,
    })
    
    const onMouseEnter = React.useCallback(
       (event) => {
          onMouseEnterProp?.(event)
          if (isDisabled) return
-         
          setFocusedIndex(index)
       },
       [setFocusedIndex, index, isDisabled, onMouseEnterProp],
@@ -424,7 +537,7 @@ export function useDropdownItem(
    const onMouseMove = React.useCallback(
       (event) => {
          onMouseMoveProp?.(event)
-         if (document.activeElement !== ref.current) {
+         if (ref.current && !isActiveElement(ref.current)) {
             onMouseEnter(event)
          }
       },
@@ -435,7 +548,6 @@ export function useDropdownItem(
       (event) => {
          onMouseLeaveProp?.(event)
          if (isDisabled) return
-         
          setFocusedIndex(-1)
       },
       [setFocusedIndex, isDisabled, onMouseLeaveProp],
@@ -444,14 +556,16 @@ export function useDropdownItem(
    const onClick = React.useCallback(
       (event: React.MouseEvent) => {
          onClickProp?.(event)
+         if (!isTargetDropdownItem(event)) return
          /**
-          * Close dropdown and parent dropdown's if `closeOnSelect` is set to `true`
+          * Close dropdown and parent dropdowns, allowing the DropdownItem
+          * to override its parent dropdown's `closeOnSelect` prop.
           */
-         if (closeOnSelect) {
+         if (closeOnSelect ?? dropdownCloseOnSelect) {
             onClose()
          }
       },
-      [onClose, onClickProp, closeOnSelect],
+      [onClose, onClickProp, dropdownCloseOnSelect, closeOnSelect],
    )
    
    const isFocused = index === focusedIndex
@@ -462,29 +576,33 @@ export function useDropdownItem(
       if (!isOpen) return
       if (isFocused && !trulyDisabled && ref.current) {
          focus(ref.current, { nextTick: true })
-      } else if (document.activeElement !== dropdownRef.current) {
-         dropdownRef.current?.focus()
+      } else if (dropdownRef.current && !isActiveElement(dropdownRef.current)) {
+         focus(dropdownRef.current)
       }
    }, [isFocused, trulyDisabled, dropdownRef, isOpen])
    
-   const tabbable = useClickable({
+   const clickableProps = useClickable({
       onClick,
       onMouseEnter,
       onMouseMove,
       onMouseLeave,
-      ref: mergeRefs(ref, externalRef),
+      ref: mergeRefs(register, ref, externalRef),
       isDisabled,
       isFocusable,
    })
    
    return {
       ...htmlProps,
-      ...tabbable,
+      ...clickableProps,
       id,
       role: "dropdownitem",
       tabIndex: isFocused ? 0 : -1,
    }
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownOption: Composes useDropdownItem to provide a selectable/checkable dropdown item
+ * -----------------------------------------------------------------------------------------------*/
 
 export interface UseDropdownOptionOptions {
    value?: string
@@ -495,32 +613,24 @@ export interface UseDropdownOptionOptions {
 
 export interface UseDropdownOptionProps
    extends UseDropdownItemProps,
-      UseDropdownOptionOptions {
-}
+      UseDropdownOptionOptions {}
 
 export function useDropdownOption(
-   props: UseDropdownOptionProps,
-   externalRef: React.Ref<any> = null,
+   props: UseDropdownOptionProps = {},
+   ref: React.Ref<any> = null,
 ) {
-   const {
-      onClick,
-      isDisabled,
-      isFocusable,
-      type = "radio",
-      isChecked,
-      ...rest
-   } = props
-   
-   const hookProps = { isDisabled, isFocusable, onClick }
-   const optionsProps = useDropdownItem(hookProps, externalRef)
-   
+   const { type = "radio", isChecked, ...rest } = props
+   const ownProps = useDropdownItem(rest, ref)
    return {
-      ...rest,
-      ...optionsProps,
+      ...ownProps,
       role: `dropdownitem${type}`,
       "aria-checked": isChecked as React.AriaAttributes["aria-checked"],
    }
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * useDropdownOptionGroup: Manages the state of multiple selectable dropdownitem or dropdown option
+ * -----------------------------------------------------------------------------------------------*/
 
 export interface UseDropdownOptionGroupProps {
    value?: string | string[]
@@ -530,7 +640,7 @@ export interface UseDropdownOptionGroupProps {
    children?: React.ReactNode
 }
 
-export function useDropdownOptionGroup(props: UseDropdownOptionGroupProps) {
+export function useDropdownOptionGroup(props: UseDropdownOptionGroupProps = {}) {
    const {
       children,
       type = "radio",

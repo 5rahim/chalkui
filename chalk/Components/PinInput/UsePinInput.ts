@@ -141,12 +141,7 @@ export function usePinInput(props: UsePinInputProps = {}) {
   } = props
 
   const uuid = useId()
-  const id = idProp ?? `pin-input-${nanoid()}`
-  
-  useEffect(() => {
-    console.log('bruh ' + idProp)
-  
-  }, [])
+  const id = idProp ?? `pin-input-${uuid}`
   
   
   const descendants = usePinInputDescendants()
@@ -297,7 +292,7 @@ export function usePinInput(props: UsePinInputProps = {}) {
         inputMode: type === "number" ? "numeric" : "text",
         type: mask ? "password" : inputType,
         ...rest,
-        // id: `${id}-${index}`,
+        id: `${id}-${index}`,
         disabled: isDisabled,
         "aria-invalid": ariaAttr(isInvalid),
         onChange: callAllHandlers(rest.onChange, onChange),

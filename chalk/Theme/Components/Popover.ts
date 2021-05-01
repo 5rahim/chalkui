@@ -1,6 +1,4 @@
 import { mode }      from '../Tools'
-import { getCSSVar } from '../../Utils'
-
 
 const parts = ["popper", "content", "header", "body", "footer", "arrow"]
 
@@ -37,8 +35,9 @@ function baseStyleArrow(props: Dict) {
 
 const baseStyleHeader = {
    px: 3,
-   py: 2,
-   borderBottomWidth: "1px",
+   pt: 2,
+   fontWeight: 'bold',
+   // borderBottomWidth: "1px",
 }
 
 const baseStyleBody = {

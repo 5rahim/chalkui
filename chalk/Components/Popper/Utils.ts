@@ -5,7 +5,7 @@ const toVar = (value: string, fallback?: string) => ({
   varRef: fallback ? `var(${value}, ${fallback})` : `var(${value})`,
 })
 
-export const popperCSSVars = {
+export const cssVars = {
   arrowShadowColor: toVar("--popper-arrow-shadow-color"),
   arrowSize: toVar("--popper-arrow-size", "8px"),
   arrowSizeHalf: toVar("--popper-arrow-size-half"),
@@ -29,15 +29,15 @@ const transforms: any = {
   top: "bottom center",
   "top-start": "bottom left",
   "top-end": "bottom right",
-
+  
   bottom: "top center",
   "bottom-start": "top left",
   "bottom-end": "top right",
-
+  
   left: "right center",
   "left-start": "right top",
   "left-end": "right bottom",
-
+  
   right: "left center",
   "right-start": "left top",
   "right-end": "left bottom",
@@ -51,7 +51,7 @@ const defaultEventListeners = {
 }
 
 export function getEventListenerOptions(
-  value?: boolean | Partial<typeof defaultEventListeners>,
+   value?: boolean | Partial<typeof defaultEventListeners>,
 ) {
   let eventListeners: {
     enabled?: boolean
@@ -60,7 +60,7 @@ export function getEventListenerOptions(
   if (typeof value === "object") {
     eventListeners = {
       enabled: true,
-      options: Object.assign(defaultEventListeners, value),
+      options: { ...defaultEventListeners, ...value },
     }
   } else {
     eventListeners = {

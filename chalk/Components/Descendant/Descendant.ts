@@ -1,10 +1,4 @@
-import { isElement } from 'react-dom/test-utils'
-import {
-   getNextIndex,
-   getPrevIndex,
-   sortNodes,
-} from './Utils'
-
+import { sortNodes, isElement, getNextIndex, getPrevIndex } from "./Utils"
 
 export type DescendantOptions<T = {}> = T & {
    /**
@@ -45,11 +39,11 @@ export class DescendantsManager<
       if (nodeOrOptions == null) return
       
       if (isElement(nodeOrOptions)) {
-         return this.registerNode(nodeOrOptions as any)
+         return this.registerNode(nodeOrOptions)
       }
       
       return (node: T | null) => {
-         this.registerNode(node, nodeOrOptions as any)
+         this.registerNode(node, nodeOrOptions)
       }
    }
    

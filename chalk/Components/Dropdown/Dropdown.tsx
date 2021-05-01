@@ -1,6 +1,32 @@
-import { CustomDomComponent, motion, Variants } from "framer-motion"
-import * as React from "react"
 import {
+   chalk,
+   forwardRef,
+   HTMLChalkProps,
+   omitThemingProps,
+   PropsOf,
+   StylesProvider,
+   SystemProps,
+   SystemStyleObject,
+   ThemingProps,
+   useMultiStyleConfig,
+   useStyles,
+   useTheme,
+}                          from "../../System"
+import {
+   cx,
+   runIfFn,
+   __DEV__,
+}                          from "../../Utils"
+import { MaybeRenderProp } from "../ReactUtils"
+import {
+   CustomDomComponent,
+   motion,
+   Variants,
+}                          from "framer-motion"
+import * as React          from "react"
+
+import {
+   DropdownDescendantsProvider,
    DropdownProvider,
    useDropdown,
    useDropdownButton,
@@ -14,10 +40,7 @@ import {
    UseDropdownOptionOptions,
    useDropdownPositioner,
    UseDropdownProps,
-}                                                                                                                                                                               from "./UseDropdown"
-import { chalk, forwardRef, HTMLChalkProps, omitThemingProps, PropsOf, StylesProvider, SystemProps, SystemStyleObject, ThemingProps, useMultiStyleConfig, useStyles, useTheme } from '../../System'
-import { MaybeRenderProp }                                                                                                                                                      from '../ReactUtils'
-import { cx, runIfFn }     from '../../Utils'
+} from "./UseDropdown"
 
 export interface DropdownProps extends UseDropdownProps, ThemingProps<"Dropdown"> {
    children: MaybeRenderProp<{
@@ -33,35 +56,37 @@ export interface DropdownProps extends UseDropdownProps, ThemingProps<"Dropdown"
  */
 export const Dropdown: React.FC<DropdownProps> = (props) => {
    const { children } = props
-   const theme = useTheme()
+   
    const styles = useMultiStyleConfig("Dropdown", props)
    const ownProps = omitThemingProps(props)
    
-   const ctx = useDropdown(ownProps)
+   const { descendants, ...ctx } = useDropdown(ownProps)
    const context = React.useMemo(() => ctx, [ctx])
    
    const { isOpen, onClose, forceUpdate } = context
    
    return (
-      <DropdownProvider value={context}>
-         <StylesProvider value={styles}>
-            {runIfFn(children, { isOpen, onClose, forceUpdate })}
-         </StylesProvider>
-      </DropdownProvider>
+      <DropdownDescendantsProvider value={descendants}>
+         <DropdownProvider value={context}>
+            <StylesProvider value={styles}>
+               {runIfFn(children, { isOpen, onClose, forceUpdate })}
+            </StylesProvider>
+         </DropdownProvider>
+      </DropdownDescendantsProvider>
    )
 }
 
 
-
-export interface DropdownButtonProps extends HTMLChalkProps<"button"> {}
+export interface DropdownButtonProps extends HTMLChalkProps<"button"> {
+}
 
 const StyledDropdownButton = forwardRef<DropdownButtonProps, "button">((props, ref) => {
-   const theme = useTheme()
    const styles = useStyles()
+   const theme = useTheme()
    return (
       <chalk.button
-         ref={ref}
          theme={theme}
+         ref={ref}
          {...props}
          __css={{
             display: "inline-flex",
@@ -82,7 +107,6 @@ export const DropdownButton = forwardRef<DropdownButtonProps, "button">(
    (props, ref) => {
       const { children, as: As, ...rest } = props
       const theme = useTheme()
-   
       const buttonProps = useDropdownButton(rest, ref)
       
       const Element = As || StyledDropdownButton
@@ -93,14 +117,13 @@ export const DropdownButton = forwardRef<DropdownButtonProps, "button">(
             {...buttonProps}
             className={cx("chalk-dropdown__dropdown-button", props.className)}
          >
-            <chalk.span __css={{ pointerEvents: "none", flex: "1 1 auto", display: 'inline-flex', alignItems: 'center' }} theme={theme}>
+            <chalk.span theme={theme} __css={{ pointerEvents: "none", flex: "1 1 auto", minW: 0 }}>
                {props.children}
             </chalk.span>
          </Element>
       )
    },
 )
-
 
 
 export interface DropdownListProps extends HTMLChalkProps<"div"> {
@@ -140,7 +163,6 @@ export const DropdownList = forwardRef<DropdownListProps, "div">((props, ref) =>
    const { rootProps, ...rest } = props
    const { isOpen, onTransitionEnd } = useDropdownContext()
    const theme = useTheme()
-   
    const listProps: any = useDropdownList(rest, ref)
    const positionerProps = useDropdownPositioner(rootProps)
    
@@ -174,16 +196,14 @@ export const DropdownList = forwardRef<DropdownListProps, "div">((props, ref) =>
 })
 
 
-
-export interface StyledDropdownItemProps extends HTMLChalkProps<"button"> {}
+export interface StyledDropdownItemProps extends HTMLChalkProps<"button"> {
+}
 
 const StyledDropdownItem = forwardRef<StyledDropdownItemProps, "button">(
    (props, ref) => {
-      const theme = useTheme()
-   
       const { type, ...rest } = props
       const styles = useStyles()
-      
+      const theme = useTheme()
       /**
        * Given another component, use its type if present
        * Else, use no type to avoid invalid html, e.g. <a type="button" />
@@ -198,7 +218,7 @@ const StyledDropdownItem = forwardRef<StyledDropdownItemProps, "button">(
          display: "flex",
          width: "100%",
          alignItems: "center",
-         textAlign: "start",
+         textAlign: "left",
          flex: "0 0 auto",
          outline: 0,
          ...styles.item,
@@ -211,7 +231,8 @@ const StyledDropdownItem = forwardRef<StyledDropdownItemProps, "button">(
 )
 
 interface DropdownItemOptions
-   extends Pick<UseDropdownItemProps, "isDisabled" | "isFocusable"> {
+   extends Pick<UseDropdownItemProps,
+      "isDisabled" | "isFocusable" | "closeOnSelect"> {
    /**
     * The icon to render before the dropdown item's label.
     * @type React.ReactElement
@@ -235,7 +256,8 @@ interface DropdownItemOptions
 
 export interface DropdownItemProps
    extends HTMLChalkProps<"button">,
-      DropdownItemOptions {}
+      DropdownItemOptions {
+}
 
 export const DropdownItem = forwardRef<DropdownItemProps, "button">((props, ref) => {
    const {
@@ -247,10 +269,8 @@ export const DropdownItem = forwardRef<DropdownItemProps, "button">((props, ref)
       ...rest
    } = props
    
-   const theme = useTheme()
-   
    const dropdownItemProps = useDropdownItem(rest, ref) as DropdownItemProps
-   
+   const theme = useTheme()
    const shouldWrap = icon || command
    
    const _children = shouldWrap ? (
@@ -266,7 +286,7 @@ export const DropdownItem = forwardRef<DropdownItemProps, "button">((props, ref)
          className={cx("chalk-dropdown__dropdownitem", dropdownItemProps.className)}
       >
          {icon && (
-            <DropdownIcon fontSize="1.2em" marginRight={iconSpacing}>
+            <DropdownIcon fontSize="0.8em" marginRight={iconSpacing}>
                {icon}
             </DropdownIcon>
          )}
@@ -277,7 +297,6 @@ export const DropdownItem = forwardRef<DropdownItemProps, "button">((props, ref)
       </StyledDropdownItem>
    )
 })
-
 
 
 const CheckIcon: React.FC<PropsOf<"svg">> = (props) => (
@@ -304,10 +323,8 @@ export interface DropdownItemOptionProps
 
 export const DropdownItemOption = forwardRef<DropdownItemOptionProps, "button">(
    (props, ref) => {
-      const theme = useTheme()
-   
       const { icon, iconSpacing = "0.75rem", ...rest } = props
-      
+      const theme = useTheme()
       const optionProps = useDropdownOption(rest, ref) as StyledDropdownItemProps
       
       return (
@@ -317,7 +334,6 @@ export const DropdownItemOption = forwardRef<DropdownItemOptionProps, "button">(
             className={cx("chalk-dropdown__dropdownitem-option", rest.className)}
          >
             <DropdownIcon
-               theme={theme}
                fontSize="0.8em"
                marginRight={iconSpacing}
                opacity={props.isChecked ? 1 : 0}
@@ -333,16 +349,17 @@ export const DropdownItemOption = forwardRef<DropdownItemOptionProps, "button">(
 DropdownItemOption.id = "DropdownItemOption"
 
 
-
 export interface DropdownOptionGroupProps
    extends UseDropdownOptionGroupProps,
-      Omit<DropdownGroupProps, "value" | "defaultValue" | "onChange"> {}
+      Omit<DropdownGroupProps, "value" | "defaultValue" | "onChange"> {
+}
 
 export const DropdownOptionGroup: React.FC<DropdownOptionGroupProps> = (props) => {
-   const { className, title, ...rest }: any = props
+   const { className, title, ...rest } = props
    const ownProps = useDropdownOptionGroup(rest)
    return (
       <DropdownGroup
+         // @ts-ignore
          title={title}
          className={cx("chalk-dropdown__option-group", className)}
          {...ownProps}
@@ -350,14 +367,16 @@ export const DropdownOptionGroup: React.FC<DropdownOptionGroupProps> = (props) =
    )
 }
 
+if (__DEV__) {
+   DropdownOptionGroup.displayName = "DropdownOptionGroup"
+}
 
-export interface DropdownGroupProps extends HTMLChalkProps<"div"> {}
+export interface DropdownGroupProps extends HTMLChalkProps<"div"> {
+}
 
 export const DropdownGroup = forwardRef<DropdownGroupProps, "div">((props, ref) => {
-   const theme = useTheme()
-   
    const { title, children, className, ...rest } = props
-   
+   const theme = useTheme()
    const _className = cx("chalk-dropdown__group__title", className)
    const styles = useStyles()
    
@@ -374,14 +393,13 @@ export const DropdownGroup = forwardRef<DropdownGroupProps, "div">((props, ref) 
 })
 
 
-
-export interface DropdownCommandProps extends HTMLChalkProps<"span"> {}
+export interface DropdownCommandProps extends HTMLChalkProps<"span"> {
+}
 
 export const DropdownCommand = forwardRef<DropdownCommandProps, "span">(
    (props, ref) => {
-      const theme = useTheme()
-   
       const styles = useStyles()
+      const theme = useTheme()
       return (
          <chalk.span
             theme={theme}
@@ -395,19 +413,17 @@ export const DropdownCommand = forwardRef<DropdownCommandProps, "span">(
 )
 
 
-
 export const DropdownIcon: React.FC<HTMLChalkProps<"span">> = (props) => {
    const { className, children, ...rest } = props
    const theme = useTheme()
-   
    const child = React.Children.only(children)
    
    const clone = React.isValidElement(child)
       ? React.cloneElement(child, {
+         theme: theme,
          focusable: "false",
          "aria-hidden": true,
          className: cx("chalk-dropdown__icon", child.props.className),
-         theme: theme
       })
       : null
    
@@ -428,14 +444,13 @@ export const DropdownIcon: React.FC<HTMLChalkProps<"span">> = (props) => {
 }
 
 
-
-export interface DropdownDividerProps extends HTMLChalkProps<"hr"> {}
+export interface DropdownDividerProps extends HTMLChalkProps<"hr"> {
+}
 
 export const DropdownDivider: React.FC<DropdownDividerProps> = (props) => {
-   const theme = useTheme()
-   
    const { className, ...rest } = props
    const styles = useStyles()
+   const theme = useTheme()
    return (
       <chalk.hr
          theme={theme}
@@ -447,4 +462,3 @@ export const DropdownDivider: React.FC<DropdownDividerProps> = (props) => {
       />
    )
 }
-

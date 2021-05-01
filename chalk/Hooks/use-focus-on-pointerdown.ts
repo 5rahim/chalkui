@@ -1,13 +1,13 @@
-import { RefObject }        from "react"
-import { usePointerEvent }  from "./use-pointer-event"
-import { detectBrowser }    from '../Utils/UserAgent'
 import {
   contains,
+  detectBrowser,
   focus,
   getOwnerDocument,
   isActiveElement,
   isRefObject,
-} from '../Utils'
+} from "../Utils"
+import { RefObject } from "react"
+import { usePointerEvent } from "./use-pointer-event"
 
 export interface UseFocusOnMouseDownProps {
   enabled?: boolean

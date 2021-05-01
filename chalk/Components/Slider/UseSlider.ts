@@ -6,13 +6,10 @@ import {
    useIds,
    useLatestRef,
    usePanGesture,
+   usePrevious,
    useUpdateEffect,
-}                        from "../../Hooks"
-import {
-   EventKeyMap,
-   mergeRefs,
-   PropGetter,
-}                        from "../ReactUtils"
+} from "../../Hooks"
+import { EventKeyMap, mergeRefs, PropGetter } from "../ReactUtils"
 import {
    AnyPointerEvent,
    ariaAttr,
@@ -25,13 +22,8 @@ import {
    percentToValue,
    roundValueToStep,
    valueToPercent,
-}                        from "../../Utils"
-import React, {
-   CSSProperties,
-   useCallback,
-   useMemo,
-   useRef,
-}                        from "react"
+} from "../../Utils"
+import { CSSProperties, useCallback, useMemo, useRef } from "react"
 import { getPartsStyle } from "./Utils"
 
 export interface UseSliderProps {
@@ -67,22 +59,18 @@ export interface UseSliderProps {
     * If `true`, the value will be incremented or decremented in reverse.
     */
    isReversed?: boolean
-   
    /**
     * function gets called whenever the user starts dragging the slider handle
     */
    onChangeStart?(value: number): void
-   
    /**
     * function gets called whenever the user stops dragging the slider handle.
     */
    onChangeEnd?(value: number): void
-   
    /**
     * function gets called whenever the slider handle is being dragged or clicked
     */
    onChange?(value: number): void
-   
    /**
     * The base `id` to use for the slider and its components
     */
@@ -100,14 +88,12 @@ export interface UseSliderProps {
     * If `true`, the slider will be in `read-only` state
     */
    isReadOnly?: boolean
-   
    /**
     * Function that returns the `aria-valuetext` for screen readers.
     * It is mostly used to generate a more human-readable
     * representation of the value for assistive technologies
     */
    getAriaValueText?(value: number): string
-   
    /**
     * If `false`, the slider handle will not capture focus when value changes.
     * @default true
@@ -160,9 +146,9 @@ export function useSlider(props: UseSliderProps) {
       name,
       focusThumbOnChange = true,
       ...htmlProps
-   }: any = props
+   } = props
    
-   const onChangeStart = useCallbackRef(onChangeEndProp)
+   const onChangeStart = useCallbackRef(onChangeStartProp)
    const onChangeEnd = useCallbackRef(onChangeEndProp)
    const getAriaValueText = useCallbackRef(getAriaValueTextProp)
    
@@ -176,7 +162,10 @@ export function useSlider(props: UseSliderProps) {
    })
    
    const [isDragging, setDragging] = useBoolean()
+   const prevIsDragging = usePrevious(isDragging)
+   
    const [isFocused, setFocused] = useBoolean()
+   const eventSourceRef = useRef<"pointer" | "keyboard" | null>(null)
    
    const isInteractive = !(isDisabled || isReadOnly)
    
@@ -186,6 +175,8 @@ export function useSlider(props: UseSliderProps) {
     */
    const value = clampValue(computedValue, min, max)
    const valueRef = useLatestRef(value)
+   
+   const prevRef = useRef(valueRef.current)
    
    const reversedValue = max - value + min
    const trackValue = isReversed ? reversedValue : value
@@ -214,8 +205,8 @@ export function useSlider(props: UseSliderProps) {
    
    const getValueFromPointer = useCallback(
       (event) => {
-         if (!trackRef.current) return undefined
-         
+         if (!trackRef.current) return
+         eventSourceRef.current = "pointer"
          const trackRect = getBox(trackRef.current).borderBox
          const { clientX, clientY } = event.touches?.[0] ?? event
          
@@ -248,7 +239,6 @@ export function useSlider(props: UseSliderProps) {
    
    const constrain = useCallback(
       (value: number) => {
-         // bail out if slider isn't interactive
          if (!isInteractive) return
          value = parseFloat(roundValueToStep(value, min, oneStep))
          value = clampValue(value, min, max)
@@ -280,7 +270,7 @@ export function useSlider(props: UseSliderProps) {
    const onKeyDown = useCallback(
       (event: React.KeyboardEvent) => {
          const eventKey = normalizeEventKey(event)
-         const keyMap: EventKeyMap | any = {
+         const keyMap: EventKeyMap = {
             ArrowRight: () => actions.stepUp(),
             ArrowUp: () => actions.stepUp(),
             ArrowLeft: () => actions.stepDown(),
@@ -297,6 +287,7 @@ export function useSlider(props: UseSliderProps) {
             event.preventDefault()
             event.stopPropagation()
             action(event)
+            eventSourceRef.current = "keyboard"
          }
       },
       [actions, constrain, max, min, tenSteps],
@@ -335,7 +326,10 @@ export function useSlider(props: UseSliderProps) {
    
    useUpdateEffect(() => {
       focusThumb()
-   }, [value])
+      if (eventSourceRef.current === "keyboard") {
+         onChangeEndProp?.(valueRef.current)
+      }
+   }, [value, onChangeEndProp])
    
    const setValueFromPointer = (event: AnyPointerEvent) => {
       const nextValue = getValueFromPointer(event)
@@ -345,10 +339,16 @@ export function useSlider(props: UseSliderProps) {
    }
    
    usePanGesture(rootRef, {
-      onPanSessionStart(event: any) {
+      onPanSessionStart(event) {
          if (!isInteractive) return
          setValueFromPointer(event)
-         focusThumb()
+      },
+      onPanSessionEnd() {
+         if (!isInteractive) return
+         if (!prevIsDragging && prevRef.current !== valueRef.current) {
+            onChangeEnd?.(valueRef.current)
+            prevRef.current = valueRef.current
+         }
       },
       onPanStart() {
          if (!isInteractive) return
@@ -413,7 +413,7 @@ export function useSlider(props: UseSliderProps) {
          ...props,
          ref: mergeRefs(ref, thumbRef),
          role: "slider",
-         tabIndex: 0,
+         tabIndex: isInteractive ? 0 : undefined,
          id: thumbId,
          "data-active": dataAttr(isDragging),
          "aria-valuetext": valueText,
@@ -439,6 +439,7 @@ export function useSlider(props: UseSliderProps) {
          isDisabled,
          isDragging,
          isReadOnly,
+         isInteractive,
          max,
          min,
          onKeyDown,

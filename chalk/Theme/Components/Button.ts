@@ -15,14 +15,14 @@ function variantSecondary(props: Dictionary) {
    if (colorScheme.includes('gray')) {
       
       return {
-         bg: secondaryBackground('gray.500', props),
+         bg: mode(secondaryBackground('gray.500', props), secondaryBackground('gray.400', props))(props),
          // color: mode('gray.500', `whiteAlpha.900`)(props),
-         color: secondaryColor('gray.500', props),
+         color: mode(secondaryColor('gray.500', props), secondaryColor('gray.400', props))(props),
          _hover: {
-            bg: secondaryBackgroundHover('gray.500', props),
+            bg: mode(secondaryBackgroundHover('gray.500', props), secondaryBackgroundHover('gray.400', props))(props),
          },
          _active: {
-            bg: secondaryBackgroundActive('gray.500', props),
+            bg: mode(secondaryBackgroundActive('gray.500', props), secondaryBackgroundActive('gray.400', props))(props),
          },
       }
    }
@@ -58,26 +58,32 @@ function variantSecondary(props: Dictionary) {
 function variantOutline(props: Dictionary) {
    const { colorScheme } = props
    const isLighter = colorScheme.includes('100') || colorScheme.includes('200') || colorScheme.includes('300')
-   const isDarkerGray = (colorScheme.includes('800') || colorScheme.includes('900')) && colorScheme.includes('gray')
+   // const isDarkerGray =
+   //    (colorScheme.includes('600') ||
+   //    colorScheme.includes('700') ||
+   //    colorScheme.includes('800') ||
+   //       colorScheme.includes('900'))
+   //    && colorScheme.includes('gray')
    
    const basicStyle = {
       border: "1px solid",
    }
    
-   if (isDarkerGray) {
+   if (colorScheme.includes('gray')) {
+      const c = mode('gray.500', 'gray.300')(props)
       return {
          ...basicStyle,
-         borderColor: 'gray.700',
-         color: 'gray.700',
+         borderColor: c,
+         color: c,
          _hover: {
             color: "white",
-            borderColor: 'gray.700',
-            bg: 'gray.700',
+            borderColor: c,
+            bg: c,
          },
          _active: {
             color: "white",
             borderColor: 'transparent',
-            bg: darken('gray.700', 10),
+            bg: darken(c, 10),
          },
       }
    }
@@ -85,7 +91,7 @@ function variantOutline(props: Dictionary) {
    
    if (isLighter) {
       const c = !colorScheme.includes('gray') ? colorScheme.split('.')[0] + '.300' : 'gray.400'
-      
+
       return {
          ...basicStyle,
          borderColor: c,
@@ -128,18 +134,19 @@ function variantGhost(props: Dictionary) {
    const isLighter = colorScheme.includes('100') || colorScheme.includes('200') || colorScheme.includes('300')
    const isDarkerGray = (colorScheme.includes('800') || colorScheme.includes('900')) && colorScheme.includes('gray')
    
-   if (isDarkerGray) {
+   if (colorScheme.includes('gray')) {
+      const c = mode('gray.500', 'gray.300')(props)
       return {
-         borderColor: 'gray.700',
-         color: 'gray.700',
+         borderColor: c,
+         color: c,
          _hover: {
             color: "white",
-            borderColor: 'gray.700',
-            bg: 'gray.700',
+            borderColor: c,
+            bg: c,
          },
          _active: {
             borderColor: 'transparent',
-            bg: darken('gray.700', 10),
+            bg: darken(c, 10),
          },
       }
    }
@@ -264,14 +271,9 @@ function variantLink(props: Dictionary) {
    const { colorScheme } = props
    
    const colors = () => {
-      if (colorScheme.includes('100') || colorScheme.includes('200')) {
+      if (colorScheme.includes('gray')) {
          return {
-            color: secondaryColor(colorScheme, props),
-         }
-      }
-      if ((colorScheme.includes('800') || colorScheme.includes('900')) && colorScheme.includes('gray')) {
-         return {
-            color: 'gray.700',
+            color: mode(secondaryColor('gray.500', props), secondaryColor('gray.500', props))(props),
          }
       }
       return { color: secondaryColor(colorScheme, props) }
