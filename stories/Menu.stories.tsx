@@ -1,17 +1,41 @@
-import { MenuItem, MenuList, MenuPanel, MenuPanels, Menu, useTab, MenuHeader } from "../chalk/Components/Menu"
-import { Box }                                                                 from "../chalk/Components/Layout/Box"
-import { Stack }                                                                                                                 from "../chalk/Components/Layout/Stack"
-import { Text }                                                                                                                  from "../chalk/Components/Typography/Text"
-import React                                                                                                                     from "react"
-import { Icon }                                                                                                                  from '../chalk/Components/Icon'
-import { BiArchive, BiBadge, BiBarChartSquare, BiBookmark, BiCalendar, BiCreditCard, BiFile, BiFolder, BiGroup, BiHome, BiUser } from 'react-icons/all'
-import { useColorModeValue }                                                                                                     from '../chalk/ColorMode'
-import { Badge }                                                                                                                 from '../chalk/Components/Layout/Badge'
-import { chalk, forwardRef, useStyles }                                                                                          from '../chalk/System'
-import { useTheme }                                                                                                              from '@emotion/react'
-import { Heading }                                                                                                               from '../chalk/Components/Typography/Heading'
-import { List }                                                                                                                  from '../chalk/Components/Layout/List'
-import { Flex }                                                                                                                  from '../chalk/Components/Layout/Flex'
+import {
+   MenuItem,
+   MenuList,
+   MenuPanel,
+   MenuPanels,
+   Menu,
+   useTab,
+   MenuHeader,
+}                            from "../chalk/Components/Menu"
+import { Box }               from "../chalk/Components/Layout/Box"
+import { Stack }             from "../chalk/Components/Layout/Stack"
+import { Text }              from "../chalk/Components/Typography/Text"
+import React                 from "react"
+import { Icon }              from '../chalk/Components/Icon'
+import {
+   BiArchive,
+   BiBadge,
+   BiBarChartSquare,
+   BiBookmark,
+   BiCalendar,
+   BiCreditCard,
+   BiFile,
+   BiFolder,
+   BiGroup,
+   BiHome,
+   BiUser,
+}                            from 'react-icons/bi'
+import { useColorModeValue } from '../chalk/ColorMode'
+import { Badge }             from '../chalk/Components/Layout/Badge'
+import {
+   chalk,
+   forwardRef,
+   useStyles,
+}                            from '../chalk/System'
+import { useTheme }          from '@emotion/react'
+import { Heading }           from '../chalk/Components/Typography/Heading'
+import { List }              from '../chalk/Components/Layout/List'
+import { Flex }              from '../chalk/Components/Layout/Flex'
 
 export default {
    title: 'Collections/Menu',
@@ -73,7 +97,7 @@ export const UnderlineWithIcons = () => (
             <MenuItem><Icon as={BiCreditCard} mr={2} /> Billing</MenuItem>
             <MenuItem><Icon as={BiFolder} mr={2} /> My Documents</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -92,7 +116,7 @@ export const UnderlineWithIcons = () => (
             <MenuItem><Icon as={BiCreditCard} mr={2} /> Billing</MenuItem>
             <MenuItem><Icon as={BiFolder} mr={2} /> My Documents</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -131,7 +155,7 @@ export const UnderlineWithIcons = () => (
 // )
 
 export const UnderlineWithBadges = () => {
-
+   
    const StyledTab = chalk("a", { themeKey: "Menu.MenuItem" })
    
    const CustomMenuItem = forwardRef((props, ref) => {
@@ -243,7 +267,7 @@ export const Rounded = () => (
             <MenuItem>Two</MenuItem>
             <MenuItem>Three</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -262,7 +286,7 @@ export const Rounded = () => (
             <MenuItem>Two</MenuItem>
             <MenuItem>Three</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -286,7 +310,7 @@ export const SolidRounded = () => (
             <MenuItem>Two</MenuItem>
             <MenuItem>Three</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -305,7 +329,7 @@ export const SolidRounded = () => (
             <MenuItem>Two</MenuItem>
             <MenuItem>Three</MenuItem>
          </MenuList>
-      
+         
          <MenuPanels>
             <MenuPanel>
                <p>one!</p>
@@ -397,10 +421,9 @@ export const Basic = () => (
             <MenuItem>Most popular</MenuItem>
          </MenuList>
       </Menu>
-      
+   
    </Stack>
 )
-
 
 
 export const VerticalBasic = () => (
@@ -413,8 +436,6 @@ export const VerticalBasic = () => (
       </MenuList>
    </Menu>
 )
-
-
 
 
 export const VerticalRounded = () => (
@@ -464,34 +485,33 @@ export const VerticalWithBadges = () => {
    })
    
    return (
-   <Menu variant="rounded" orientation="vertical" width="300px" colorScheme="purple.500">
-      <MenuList>
-         <CustomMenuItem badge={"+99"}><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome /></Box>Dashboard</CustomMenuItem>
-         <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup /></Box>Team</CustomMenuItem>
-         <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder /></Box>Projects</CustomMenuItem>
-         <MenuHeader>Header</MenuHeader>
-         <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar /></Box>Calendar</CustomMenuItem>
-         <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile /></Box>Documents</CustomMenuItem>
-         <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare /></Box>Reports</CustomMenuItem>
-      </MenuList>
-   </Menu>
-)
+      <Menu variant="rounded" orientation="vertical" width="300px" colorScheme="purple.500">
+         <MenuList>
+            <CustomMenuItem badge={"+99"}><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome /></Box>Dashboard</CustomMenuItem>
+            <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup /></Box>Team</CustomMenuItem>
+            <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder /></Box>Projects</CustomMenuItem>
+            <MenuHeader>Header</MenuHeader>
+            <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar /></Box>Calendar</CustomMenuItem>
+            <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile /></Box>Documents</CustomMenuItem>
+            <CustomMenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare /></Box>Reports</CustomMenuItem>
+         </MenuList>
+      </Menu>
+   )
 }
 
 
 export const RightAccent = () => (
    <Menu variant="right-accent" orientation="vertical" width="300px">
       <MenuList>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome/></Box>Dashboard</MenuItem>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup/></Box>Team</MenuItem>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder/></Box>Projects</MenuItem>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar/></Box>Calendar</MenuItem>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile/></Box>Documents</MenuItem>
-         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare/></Box>Reports</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome /></Box>Dashboard</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup /></Box>Team</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder /></Box>Projects</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar /></Box>Calendar</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile /></Box>Documents</MenuItem>
+         <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare /></Box>Reports</MenuItem>
       </MenuList>
    </Menu>
 )
-
 
 
 export const Custom = () => (
@@ -508,12 +528,12 @@ export const Custom = () => (
          size="lg"
       >
          <MenuList>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome/></Box>Dashboard</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup/></Box>Team</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder/></Box>Projects</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar/></Box>Calendar</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile/></Box>Documents</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare/></Box>Reports</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome /></Box>Dashboard</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup /></Box>Team</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder /></Box>Projects</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar /></Box>Calendar</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile /></Box>Documents</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare /></Box>Reports</MenuItem>
          </MenuList>
       </Menu>
    </Box>
@@ -536,12 +556,12 @@ export const Custom2 = () => (
          spacing=".5rem"
       >
          <MenuList>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome/></Box>Dashboard</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup/></Box>Team</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder/></Box>Projects</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar/></Box>Calendar</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile/></Box>Documents</MenuItem>
-            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare/></Box>Reports</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiHome /></Box>Dashboard</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiGroup /></Box>Team</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFolder /></Box>Projects</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiCalendar /></Box>Calendar</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiFile /></Box>Documents</MenuItem>
+            <MenuItem><Box ml={-1} mr={3} fontSize="1.4rem"><BiBarChartSquare /></Box>Reports</MenuItem>
          </MenuList>
       </Menu>
    </Box>

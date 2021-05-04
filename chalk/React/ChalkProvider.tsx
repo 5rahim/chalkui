@@ -6,16 +6,20 @@ import {
    GlobalStyle,
    ThemeProvider,
    useColorMode,
-}                        from "../System"
+} from "../System"
 import defaultTheme      from "../Theme"
-import { Dictionary }    from "../Utils"
+import { Dict }          from "../Utils"
+import {
+   EnvironmentProvider,
+   EnvironmentProviderProps,
+}                        from "../Env"
 import * as React        from "react"
 
 export interface ChalkProviderProps {
    /**
     * a theme. if omitted, uses the default theme provided by chalk
     */
-   theme?: Dictionary
+   theme?: Dict
    /**
     * Common z-index to use for `Portal`
     *
@@ -38,7 +42,18 @@ export interface ChalkProviderProps {
     * @default localStorageManager
     */
    colorModeManager?: ColorModeProviderProps["colorModeManager"]
+   /**
+    * Your application content
+    */
    children?: React.ReactNode
+   /**
+    * The environment (`window` and `document`) to be used by
+    * all components and hooks.
+    *
+    * By default, we smartly determine the ownerDocument and defaultView
+    * based on where `ChalkProvider` is rendered.
+    */
+   environment?: EnvironmentProviderProps["environment"]
 }
 
 /**
@@ -52,26 +67,30 @@ export const ChalkProvider = (props: ChalkProviderProps) => {
       portalZIndex,
       resetCSS = true,
       theme = defaultTheme,
+      environment,
    } = props
    
    return (
-      <ThemeProvider theme={theme}>
-         <ColorModeProvider colorModeManager={colorModeManager} options={theme.config}>
-            
-            {resetCSS && <CSSReset />}
-            
-            <GlobalStyle />
-            
-            {portalZIndex ? (
-               <PortalManager zIndex={portalZIndex}>{children}</PortalManager>
-            ) : (
-               children
-            )}
-         
-         </ColorModeProvider>
-      </ThemeProvider>
+      <EnvironmentProvider environment={environment}>
+         <ThemeProvider theme={theme}>
+            <ColorModeProvider
+               colorModeManager={colorModeManager}
+               options={theme.config}
+            >
+               {resetCSS && <CSSReset />}
+               <GlobalStyle />
+               {portalZIndex ? (
+                  <PortalManager zIndex={portalZIndex}>{children}</PortalManager>
+               ) : (
+                  children
+               )}
+            </ColorModeProvider>
+         </ThemeProvider>
+      </EnvironmentProvider>
    )
 }
+
+
 
 export const ColorModeToggleButton: React.FC<any> = () => {
    const { colorMode, toggleColorMode } = useColorMode()

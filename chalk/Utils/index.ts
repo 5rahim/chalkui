@@ -1,5 +1,5 @@
 /**
- * Source code from @chakra-ui/utils
+ * Source code from @chalk-ui/utils
  */
 
 export * from './Array'

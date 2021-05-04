@@ -13,7 +13,7 @@ export default {
 export const Base = () => (
    <Stack direction="row">
       <Code children="console.log(welcome)" />
-      <Code colorScheme="red.500" children="var chakra = 'awesome!'" />
-      <Code colorScheme="yellow.500" children="npm install chakra" />
+      <Code colorScheme="red.500" children="var chalk = 'awesome!'" />
+      <Code colorScheme="yellow.500" children="npm install chalk" />
    </Stack>
 )

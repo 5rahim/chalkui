@@ -10,13 +10,19 @@ import {
    useStyles,
    useTheme,
    useToken,
-}                                 from "../../System"
-import * as React                 from "react"
-import { cx }                     from '../../Utils'
-import { Icon, IconProps }        from '../Icon'
-import { VisuallyHidden }         from '../VisuallyHidden'
-import { IoArrowDown, IoArrowUp } from 'react-icons/all'
-import { secondaryBackground }    from '../../Theme/Tools'
+}                              from "../../System"
+import * as React              from "react"
+import { cx }                  from '../../Utils'
+import {
+   Icon,
+   IconProps,
+}                              from '../Icon'
+import { VisuallyHidden }      from '../VisuallyHidden'
+import {
+   IoIosArrowDown,
+   IoIosArrowUp,
+}                              from 'react-icons/io'
+import { secondaryBackground } from '../../Theme/Tools'
 
 export interface StatLabelProps extends HTMLChalkProps<"dt"> {
 }
@@ -85,7 +91,7 @@ export const StatIndicator = forwardRef<StatIndicatorProps, "dd">((props, ref) =
    const theme = useTheme()
    const styles = useStyles()
    const [green, red] = useToken("colors", ["green.500", "red.500"])
-   const g = useToken("colors", useColorModeValue('green.500', 'green.300'));
+   const g = useToken("colors", useColorModeValue('green.500', 'green.300'))
    const r = useToken("colors", useColorModeValue('red.500', 'red.300'))
    const color = type === 'increase' ? g : r
    
@@ -137,7 +143,7 @@ export const StatArrow: React.FC<StatArrowProps> = (props) => {
    
    const cType = styles.type || type
    
-   const IconComponent = cType === "increase" ? IoArrowUp : IoArrowDown
+   const IconComponent = cType === "increase" ? IoIosArrowUp : IoIosArrowDown
    const defaultAriaLabel = cType === "increase" ? "increased by" : "decreased by"
    const label = ariaLabel || defaultAriaLabel
    const [green, red] = useToken("colors", ["green.500", "red.500"])

@@ -4,7 +4,7 @@ import {
 }                              from "../chalk/Components/Notification"
 import { Box }                 from "../chalk/Components/Layout/Box"
 import React                   from "react"
-import { BiCheckCircle }       from 'react-icons/all'
+import { BiCheckCircle }       from 'react-icons/bi'
 import { Button, ButtonGroup } from '../chalk/Components/Button'
 import { useToast }            from '../chalk/Components/Toast/UseToast'
 import { Avatar }              from '../chalk/Components/Avatar'

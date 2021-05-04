@@ -15,12 +15,12 @@ const [PortalContextProvider, usePortalContext] = createContext<PortalContext>({
    name: "PortalContext",
 })
 
-const PORTAL_CLASSNAME = "chakra-portal"
-const PORTAL_SELECTOR = `.chakra-portal`
+const PORTAL_CLASSNAME = "chalk-portal"
+const PORTAL_SELECTOR = `.chalk-portal`
 
 const Container: React.FC<{ zIndex: number }> = (props) => (
    <div
-      className="chakra-portal-zIndex"
+      className="chalk-portal-zIndex"
       style={{
          position: "absolute",
          zIndex: props.zIndex,
@@ -28,7 +28,7 @@ const Container: React.FC<{ zIndex: number }> = (props) => (
          left: 0,
          right: 0,
          // NB: Don't add `bottom: 0`, it makes the entire app unusable
-         // @see https://github.com/chakra-ui/chakra-ui/issues/3201
+         // @see https://github.com/chalk-ui/chalk-ui/issues/3201
       }}
    >
       {props.children}
@@ -160,7 +160,6 @@ export interface PortalProps {
  * Declarative component used to render children into a DOM node
  * that exists outside the DOM hierarchy of the parent component.
  *
- * @see Docs https://chakra-ui.com/docs/components/portal
  */
 
 export function Portal(props: PortalProps) {

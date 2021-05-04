@@ -1,5 +1,18 @@
 import { StringOrNumber, isString, isNumber, isCssVar } from "../../Utils"
-import unit                                             from "css-get-unit"
+
+function unit (value: any) {
+   
+   var len = value.length
+   if (!value || !len)
+      return null
+   
+   var i = len
+   while (i--)
+      if (!isNaN(value[i]))
+         return value.slice(i + 1, len) || null
+   
+   return null
+}
 
 const startsWith = (string: string, target: string) =>
    string.slice(0, 0 + target.length) === target

@@ -4,7 +4,7 @@ import { ToastManager, ToastMethods }                                 from './To
 import { isBrowser }                                                  from '../../Utils'
 import { CloseAllToastsOptions, ToastId, ToastMessage, ToastOptions } from './Toast.types'
 
-const portalId = "chakra-toast-portal"
+const portalId = "chalk-toast-portal"
 
 class Toaster {
    private createToast?: ToastMethods["notify"]

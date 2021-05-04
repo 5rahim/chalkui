@@ -1,12 +1,31 @@
-import { Dropdown, DropdownButton, DropdownDivider, DropdownGroup, DropdownItem, DropdownItemOption, DropdownList, DropdownOptionGroup } from "../chalk/Components/Dropdown"
-import { Box }                                                                                                                           from "../chalk/Components/Layout/Box"
-import { Stack }                                                                 from "../chalk/Components/Layout/Stack"
-import { Text }                                                                  from "../chalk/Components/Typography/Text"
-import React                                                    from "react"
-import { Button, IconButton }                                           from '../chalk/Components/Button'
-import { BiChevronDown, BiDownArrow, BiEdit, BiLink, BiMenu, BiRepeat } from 'react-icons/all'
-import { Image, Img }                                                   from "../chalk/Components/Image"
-import { BiPlus }                                                                from 'react-icons/bi'
+import {
+   Dropdown,
+   DropdownButton,
+   DropdownDivider,
+   DropdownGroup,
+   DropdownItem,
+   DropdownItemOption,
+   DropdownList,
+   DropdownOptionGroup,
+}                 from "../chalk/Components/Dropdown"
+import React      from "react"
+import {
+   Button,
+   IconButton,
+}                 from '../chalk/Components/Button'
+import {
+   BiChevronDown,
+   BiDownArrow,
+   BiEdit,
+   BiLink,
+   BiMenu,
+   BiRepeat,
+}                 from 'react-icons/bi'
+import {
+   Image,
+   Img,
+}                 from "../chalk/Components/Image"
+import { BiPlus } from 'react-icons/bi'
 
 
 export default {
@@ -103,7 +122,6 @@ export const WithImage = () => (
 )
 
 
-
 export const WithIconsAndCommands = () => (
    <Dropdown>
       <DropdownButton
@@ -131,7 +149,6 @@ export const WithIconsAndCommands = () => (
 )
 
 
-
 export const Group = () => (
    <Dropdown>
       <DropdownButton as={Button} colorScheme="pink.500">
@@ -150,7 +167,6 @@ export const Group = () => (
       </DropdownList>
    </Dropdown>
 )
-
 
 
 export const WithOptions = () => (

@@ -49,7 +49,7 @@ export const ButtonGroup = forwardRef<ButtonGroupProps, "div">((props, ref) => {
       ...rest
    } = props
    
-   const _className = cx("chakra-button__group", className)
+   const _className = cx("chalk-button__group", className)
    
    const context = React.useMemo(
       () => ({ size, colorScheme, variant, isDisabled }),

@@ -1,8 +1,18 @@
-import { EASINGS, MotionVariants } from './Utils'
-import React                                from 'react'
-import { AnimatePresence, HTMLMotionProps, motion } from 'framer-motion'
-import { useUpdateEffect }                  from '../../Hooks'
-import { cx, warn }        from '../../Utils'
+import {
+   EASINGS,
+   MotionVariants,
+}                          from './Utils'
+import React               from 'react'
+import {
+   AnimatePresence,
+   HTMLMotionProps,
+   motion,
+}                          from 'framer-motion'
+import { useUpdateEffect } from '../../Hooks'
+import {
+   cx,
+   warn,
+}                          from '../../Utils'
 
 type CollapseVariants = MotionVariants<"enter" | "exit">
 
@@ -70,7 +80,8 @@ type Display = React.CSSProperties["display"]
 
 export interface CollapseProps
    extends HTMLMotionProps<"div">,
-      CollapseOptions {}
+      CollapseOptions {
+}
 
 export const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>(
    (props, ref) => {
@@ -134,7 +145,7 @@ export const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>(
             // @future: remove `any` cast when we remove `framer-motion` v3 support
             ;(onAnimationComplete as any)?.(definition)
          },
-         className: cx("chakra-collapse", className),
+         className: cx("chalk-collapse", className),
          ...rest,
          variants,
          style: { overflow: "hidden", ...style },

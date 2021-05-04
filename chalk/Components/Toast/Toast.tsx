@@ -108,7 +108,7 @@ export const Toast: React.FC<ToastProps> = (props) => {
    return (
       <motion.li
          layout
-         className="chakra-toast"
+         className="chalk-toast"
          variants={toastMotionVariants}
          initial="initial"
          animate="animate"
@@ -119,7 +119,7 @@ export const Toast: React.FC<ToastProps> = (props) => {
          style={style}
       >
          <ReachAlert
-            className="chakra-toast__inner"
+            className="chalk-toast__inner"
             style={{
                pointerEvents: "auto",
                maxWidth: 560,

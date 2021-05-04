@@ -1,6 +1,6 @@
+import { useTheme }       from "../System"
 import React              from "react"
-import createMediaQueries from "./create-media-query"
-import { useTheme }       from '../System'
+import createMediaQueries from "./CreateMediaQuery"
 
 interface Listener {
    mediaQuery: MediaQueryList

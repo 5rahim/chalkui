@@ -9,7 +9,7 @@ import { Box }     from "../chalk/Components/Layout/Box"
 import { Stack }   from "../chalk/Components/Layout/Stack"
 import { Text }    from "../chalk/Components/Typography/Text"
 import React       from "react"
-import { BiMinus } from 'react-icons/all'
+import { BiMinus } from 'react-icons/bi'
 import { BiPlus }  from 'react-icons/bi'
 
 export default {

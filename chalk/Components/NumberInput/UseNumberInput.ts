@@ -115,7 +115,6 @@ const sanitize = (value: string) =>
  * custom number inputs.
  *
  * @see WAI-ARIA https://www.w3.org/TR/wai-aria-practices-1.1/#spinbutton
- * @see Docs     https://www.chakra-ui.com/useNumberInput
  * @see WHATWG   https://html.spec.whatwg.org/multipage/input.html#number-state-(type=number)
  */
 export function useNumberInput(props: UseNumberInputProps = {}) {

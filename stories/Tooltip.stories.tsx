@@ -7,7 +7,7 @@ import {
 }                   from "../chalk/Components/Layout/Stack"
 import { Text }     from "../chalk/Components/Typography/Text"
 import React        from "react"
-import { BiSearch } from 'react-icons/all'
+import { BiSearch } from 'react-icons/bi'
 import { Flex }     from '../chalk/Components/Layout/Flex'
 import { Center }   from '../chalk/Components/Layout/Center'
 import { Button }   from '../chalk/Components/Button'

@@ -7,7 +7,7 @@ import { Box }            from "../chalk/Components/Layout/Box"
 import { Stack }          from "../chalk/Components/Layout/Stack"
 import { Text }           from "../chalk/Components/Typography/Text"
 import React              from "react"
-import { BiChevronRight } from 'react-icons/all'
+import { BiChevronRight } from 'react-icons/bi'
 
 export default {
    title: 'Navigation/Breadcrumb',

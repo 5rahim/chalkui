@@ -1,11 +1,11 @@
-import { getClosestValue } from "./media-query.utils"
-import { useBreakpoint }   from "./use-breakpoint"
-import { useTheme }        from '../System'
+import { useTheme }        from "../System"
 import {
    arrayToObjectNotation,
    fromEntries,
    isArray,
-}                          from '../Utils'
+}                          from "../Utils"
+import { getClosestValue } from "./MediaQuery.utils"
+import { useBreakpoint }   from "./use-breakpoint"
 
 /**
  * React hook for getting the value for the current breakpoint from the

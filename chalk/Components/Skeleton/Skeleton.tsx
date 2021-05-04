@@ -10,7 +10,7 @@ import {
 import * as React             from "react"
 import { cx }                 from '../../Utils'
 import { keyframes }          from '@emotion/css'
-import { useBreakpointValue } from "../../Hooks/use-breakpoint-value"
+import { useBreakpointValue } from '../../MediaQuery'
 
 export interface SkeletonOptions {
    /**

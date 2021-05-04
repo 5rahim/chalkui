@@ -1,6 +1,6 @@
 import * as React                                                                                                         from "react"
 import { chalk, forwardRef, HTMLChalkProps, omitThemingProps, SystemStyleObject, ThemingProps, useStyleConfig, useTheme } from '../../System'
-import { BiX }                                                                                                            from 'react-icons/all'
+import { BiX }                                                                                                            from 'react-icons/bi'
 
 export interface CloseButtonProps
    extends HTMLChalkProps<"button">,

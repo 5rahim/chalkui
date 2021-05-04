@@ -1,12 +1,22 @@
-import { Tag, TagCloseButton, TagLabel, TagLeftIcon, TagRightIcon } from "../chalk/Components/Tag"
-import { Box }                                                      from "../chalk/Components/Layout/Box"
-import { HStack, Stack }                                            from "../chalk/Components/Layout/Stack"
-import { Text }                                                     from "../chalk/Components/Typography/Text"
-import React, { useState }                                          from "react"
-import { BiCog, IoAdd }                                             from 'react-icons/all'
-import { Avatar }                                                   from '../chalk/Components/Avatar'
-import { AnimatePresence }                                          from 'framer-motion'
-import { ZoomOutItem }                                              from "../chalk/Components/Animations"
+import {
+   Tag,
+   TagCloseButton,
+   TagLabel,
+   TagLeftIcon,
+   TagRightIcon,
+}                          from "../chalk/Components/Tag"
+import { Box }             from "../chalk/Components/Layout/Box"
+import {
+   HStack,
+   Stack,
+}                          from "../chalk/Components/Layout/Stack"
+import { Text }            from "../chalk/Components/Typography/Text"
+import React, { useState } from "react"
+import { BiCog }           from 'react-icons/bi'
+import { IoIosAdd }        from 'react-icons/io'
+import { Avatar }          from '../chalk/Components/Avatar'
+import { AnimatePresence } from 'framer-motion'
+import { ZoomOutItem }     from "../chalk/Components/Animations"
 
 export default {
    title: 'DataDisplay/Tag',
@@ -33,7 +43,7 @@ export const WithLeftIcon = () => (
    <HStack spacing={4}>
       {["sm", "md", "lg"].map((size) => (
          <Tag size={size} key={size} variant="secondary" colorScheme="green.500">
-            <TagLeftIcon as={IoAdd} />
+            <TagLeftIcon as={IoIosAdd} />
             <TagLabel>Tag</TagLabel>
          </Tag>
       ))}

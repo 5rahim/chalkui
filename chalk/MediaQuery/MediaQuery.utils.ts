@@ -1,6 +1,5 @@
 import { breakpoints as defaultBreakPoints } from "../Utils"
 
-
 export function getClosestValue<T = any>(
    values: Record<string, T>,
    breakpoint: string,

@@ -1,7 +1,7 @@
-import { customTheme } from '../chalk/React'
-import { mode }        from '../chalk/Theme/Tools'
+import { extendedTheme } from '../chalk/React'
+import { mode }          from '../chalk/Theme/Tools'
 
-const theme = customTheme({
+const theme = extendedTheme({
    styles: {
       global: (props: any) => ({
          body: {

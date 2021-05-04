@@ -17,7 +17,7 @@ import { BiCheck } from 'react-icons/bi'
 import {
    BiEdit,
    BiX,
-} from 'react-icons/all'
+} from 'react-icons/bi'
 
 export default {
    title: 'Forms/Editable',

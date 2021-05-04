@@ -1,6 +1,6 @@
 import { IconButton } from "../chalk/Components/Button"
 import React          from "react"
-import { BiSearch }   from 'react-icons/all'
+import { BiSearch }   from 'react-icons/bi'
 
 export default {
    title: 'Forms/IconButton',

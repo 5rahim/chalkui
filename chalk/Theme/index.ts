@@ -1,24 +1,37 @@
-import { ColorModeOptions } from "../System"
-import components           from "./Components"
-import foundations          from "./Foundations"
-import styles               from "./Styles"
+import components  from "./Components"
+import foundations from "./Foundations"
+import styles      from "./Styles"
+import {
+   ThemeConfig,
+   ThemeDirection,
+}                  from "./Theme.types"
 
-/**
- * Color mode config
- */
-const config: ColorModeOptions = {
+const direction = "ltr" as ThemeDirection
+
+const config: ThemeConfig = {
    useSystemColorMode: false,
-   initialColorMode: "dark",
+   initialColorMode: "light",
+   cssVarPrefix: "chalk",
 }
 
-// @ts-ignore
 export const theme = {
+   direction,
    ...foundations,
    components,
    styles,
    config,
 }
 
-export type Theme = typeof theme
+// export type Theme = typeof theme
+export type Theme = any
+
+/**
+ * @deprecated
+ * Duplicate theme type. Please use `Theme`
+ */
+export type DefaultChalkTheme = Theme
+
+export * from "./Theme.types"
+export * from "./Utils"
 
 export default theme
