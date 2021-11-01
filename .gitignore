@@ -25,3 +25,4 @@ yarn-error.log*
 .idea
 /dist
 /chalk/dist/
+/chalk/node_modules

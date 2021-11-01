@@ -183,7 +183,8 @@ function useFormControlProvider(props: FormControlContext) {
    )
    
    const onFocus = React.useCallback(() => {
-      scheduleMicrotask(setFocus.on)
+      // scheduleMicrotask(setFocus.on)
+      setFocus.on()
    }, [setFocus])
    
    return {

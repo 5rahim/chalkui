@@ -71,10 +71,10 @@ const promiseMicrotask = (callback: VoidFunction) => {
    Promise.resolve().then(callback)
 }
 
-export const scheduleMicrotask = __TEST__
-   ? (fn: VoidFunction) => fn()
+export const scheduleMicrotask = __TEST__ ? (fn: VoidFunction) => fn()
    : typeof queueMicrotask === "function"
-      ? queueMicrotask
+      // ? queueMicrotask
+       ? promiseMicrotask // TODO: Resolve
       : promiseMicrotask
 
 const combineFunctions = (a: Function, b: Function) => (v: any) => b(a(v))
