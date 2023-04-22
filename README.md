@@ -1,3 +1,1 @@
-# Installation
-
-`npm install chalkui --save`
+React component library inspired by Chakra UI
